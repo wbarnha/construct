@@ -3866,7 +3866,11 @@ def Optional(subcon):
         >>> d.build(None)
         b''
     """
-    return Select(subcon, Pass)
+    macro = Select(subcon, Pass)
+    def _emitfulltype(ksy, bitwise):
+        return dict(type=subcon._compileprimitivetype(ksy, bitwise), if_="not _io.eof")
+    macro._emitfulltype = _emitfulltype
+    return macro
 
 
 def If(condfunc, subcon):
