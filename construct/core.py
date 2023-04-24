@@ -4469,6 +4469,11 @@ class Peek(Subconstruct):
     def _sizeof(self, context, path):
         return 0
 
+    def _emitprimitivetype(self, ksy, bitwise):
+        name = "instance_%s" % ksy.allocateId()
+        ksy.instances[name] = dict(**self.subcon._compilefulltype(ksy, bitwise))
+        return name
+
     def _emitparse(self, code):
         code.append("""
             def parse_peek(io, func):
