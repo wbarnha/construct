@@ -960,7 +960,12 @@ class Bytes(Construct):
         return f"(io.write(obj), obj)[1]"
 
     def _emitfulltype(self, ksy, bitwise):
-        return dict(size=self.length)
+        if isinstance(self.length, int):
+            return dict(size=self.length)
+        else:
+            print(type(self.length.key))
+            return dict(size=repr(self.length).replace('this[\'', '').replace('\']', ''))
+
 
 
 @singleton
