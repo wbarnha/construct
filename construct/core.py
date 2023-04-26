@@ -963,7 +963,6 @@ class Bytes(Construct):
         if isinstance(self.length, int):
             return dict(size=self.length)
         else:
-            print(type(self.length.key))
             return dict(size=repr(self.length).replace('this[\'', '').replace('\']', ''))
 
 
