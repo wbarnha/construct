@@ -965,7 +965,6 @@ class Bytes(Construct):
         return dict(size=self.length)
 
 
-
 @singleton
 class GreedyBytes(Construct):
     r"""
