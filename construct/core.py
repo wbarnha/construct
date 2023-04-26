@@ -960,10 +960,10 @@ class Bytes(Construct):
         return f"(io.write(obj), obj)[1]"
 
     def _emitfulltype(self, ksy, bitwise):
-        if isinstance(self.length, int):
-            return dict(size=self.length)
-        else:
-            return dict(size=repr(self.length).replace('this[\'', '').replace('\']', ''))
+        if isinstance(self.length, Path):
+            return dict(size=str(self.length).replace('this[\'', '').replace('\']', ''))
+        return dict(size=self.length)
+
 
 
 
