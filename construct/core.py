@@ -2269,6 +2269,7 @@ class Struct(Construct):
             def {fname}(obj, io, this):
                 this = Container(_ = this, _params = this['_params'], _root = None, _parsing = False, _building = True, _sizing = False, _subcons = None, _io = io, _index = this.get('_index', None))
                 this['_root'] = this['_'].get('_root', this)
+                this.update(obj)
                 try:
                     objdict = obj
         """
