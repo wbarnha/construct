@@ -8,10 +8,10 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: [ '3.7', '3.8', '3.9', '3.10', '3.11', 'pypy3' ]
+        python-version: [ '3.7', '3.8', '3.9', '3.10', '3.11', 'pypy3.9' ]
         exclude:
           - os: windows-latest
-            python-version: pypy3
+            python-version: pypy3.9
     name: Python ${{ matrix.python-version }}
     steps:
       - uses: actions/checkout@v3
@@ -25,7 +25,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest pytest-benchmark enum34 numpy arrow ruamel.yaml cloudpickle lz4
       - name: Install cryptography (but not for pypy on windows)
-        if: ${{ !((matrix.os == 'windows-latest') && (matrix.python-version == 'pypy3')) }}
+        if: ${{ !((matrix.os == 'windows-latest') && (matrix.python-version == 'pypy3.9')) }}
         run: |
           pip install cryptography
       - name: Run tests
