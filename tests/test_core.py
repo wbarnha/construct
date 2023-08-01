@@ -2393,3 +2393,13 @@ def test_adapters_context_issue_954():
     IdentityAdapter = IdAdapter(Rebuild(Int16ub, len_(this.data)))
     TestStruct = Struct("len" / IdentityAdapter, "data" / Bytes(this.len))
     TestStruct.build({"data": b"123456"})
+
+def test_compile_binexpr_bitwise_and_issue_1039():
+    d = Struct(
+        "a" / Int8ub,
+        "cond" / If(this.a & 32, Int8ub),
+        Terminated,
+    )
+    common(d, b"\x00", {"a": 0, "cond": None})
+    common(d, b"\x01", {"a": 1, "cond": None})
+    common(d, b" \x05", {"a": 32, "cond": 5})
