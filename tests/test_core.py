@@ -2421,3 +2421,8 @@ def test_select_issue_1038_fixed():
         "value" / Select(If(this._.ctx == 1, Byte), If(this._.ctx == 2, Short)),
     )
     assert s.build(dict(value=9), ctx=1) == b"\x09"
+
+def test_unicode_error():
+    d = Select(PaddedString(255, "ascii"), CString("ascii"), PascalString(Byte, "ascii"), GreedyString("ascii"), Pass)
+    data = u"Афон".encode()
+    assert d.parse(data) == None

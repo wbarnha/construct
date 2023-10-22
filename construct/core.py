@@ -1692,17 +1692,25 @@ class StringEncoded(Adapter):
         self.encoding = encoding
 
     def _decode(self, obj, context, path):
-        return obj.decode(self.encoding)
+        try:
+            return obj.decode(self.encoding)
+        except:
+            raise StringError(f"cannot use encoding {self.encoding!r} to decode {obj!r}")
 
     def _encode(self, obj, context, path):
         if not isinstance(obj, unicodestringtype):
             raise StringError("string encoding failed, expected unicode string", path=path)
         if obj == u"":
             return b""
-        return obj.encode(self.encoding)
+        try:
+            return obj.encode(self.encoding)
+        except:
+            raise StringError(f"cannot use encoding {self.encoding!r} to encode {obj!r}")
 
     def _emitparse(self, code):
-        return f"({self.subcon._compileparse(code)}).decode({repr(self.encoding)})"
+        raise NotImplementedError
+        # Not sure what the correct implementation would be.
+        # return f"({self.subcon._compileparse(code)}).decode({repr(self.encoding)})"
 
     def _emitbuild(self, code):
         raise NotImplementedError
