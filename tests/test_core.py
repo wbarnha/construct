@@ -2393,3 +2393,8 @@ def test_adapters_context_issue_954():
     IdentityAdapter = IdAdapter(Rebuild(Int16ub, len_(this.data)))
     TestStruct = Struct("len" / IdentityAdapter, "data" / Bytes(this.len))
     TestStruct.build({"data": b"123456"})
+
+def test_nullterminated_longterm_issue_1046():
+    d = NullTerminated(GreedyBytes, term=b"END")
+    assert d.parse(b"xxxEND") == b"xxx"
+    raises(d.parse, b"xENDxx") == StreamError
