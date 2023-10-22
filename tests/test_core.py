@@ -2408,3 +2408,16 @@ def test_compile_binexpr_bitwise_and_issue_1039():
     common(d, b"\x00", {"a": 0, "cond": None})
     common(d, b"\x01", {"a": 1, "cond": None})
     common(d, b" \x05", {"a": 32, "cond": 5})
+
+@xfail(reason="unknown problem with Select")
+def test_select_issue_1038():
+    s = Struct(
+        "value" / Select(IfThenElse(this._params.ctx == 1, Byte, Short)),
+    )
+    assert s.build(dict(value=9), ctx=1) == b"\x09"
+
+def test_select_issue_1038_fixed():
+    s = Struct(
+        "value" / Select(If(this._.ctx == 1, Byte), If(this._.ctx == 2, Short)),
+    )
+    assert s.build(dict(value=9), ctx=1) == b"\x09"
