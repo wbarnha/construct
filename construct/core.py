@@ -5074,7 +5074,7 @@ class NullTerminated(Subconstruct):
                     stream_seek(stream, -unit, 1, path)
                 break
             data += b
-        substream = BytesIOWithOffsets(contents=data, parent_stream=stream, offset=offset)
+        substream = BytesIOWithOffsets(data, stream, offset)
         return self.subcon._parsereport(substream, context, path)
 
     def _build(self, obj, stream, context, path):
@@ -5134,7 +5134,7 @@ class NullStripped(Subconstruct):
             while end-unit >= 0 and data[end-unit:end] == pad:
                 end -= unit
             data = data[:end]
-        substream = BytesIOWithOffsets(contents=data, parent_stream=stream, offset=offset)
+        substream = BytesIOWithOffsets(data, stream, offset)
         return self.subcon._parsereport(substream, context, path)
 
     def _build(self, obj, stream, context, path):

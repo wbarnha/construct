@@ -2425,3 +2425,13 @@ def test_unicode_error():
     d = Select(PaddedString(255, "ascii"), CString("ascii"), PascalString(Byte, "ascii"), GreedyString("ascii"), Pass)
     data = u"Афон".encode()
     assert d.parse(data) == None
+
+def test_issue_1014():
+    d = Struct(
+        "version" / Int16ub,
+        "box" / Prefixed(Int8ub, Struct(
+            "position" / Tell,
+            "payload" / GreedyBytes,
+        )),
+    )
+    assert d.parse(bytes([1,2,3,4,5,6])) == Container(version=0x0102, box=Container(position=3, payload=b'\x04\x05\x06'))
