@@ -1899,7 +1899,7 @@ class Enum(Adapter):
 
     There is no default parameter, because if no mapping is found, it parses into an integer without error.
 
-    This class supports enum34 module. See examples.
+    This class supports enum module. See examples.
 
     This class supports exposing member labels as attributes, as integer-convertible strings. See examples.
 
@@ -1995,7 +1995,7 @@ class FlagsEnum(Adapter):
 
     Parses integer subcon, then creates a Container, where flags define each key. Builds from a container by bitwise-oring of each flag if it matches a set key. Can build from an integer flag or string label directly, as well as | concatenations thereof (see examples). Size is same as subcon, unless it raises SizeofError.
 
-    This class supports enum34 module. See examples.
+    This class supports enum module. See examples.
 
     This class supports exposing member labels as attributes, as bitwisable strings. See examples.
 
@@ -2085,7 +2085,7 @@ class FlagsEnum(Adapter):
 
 class Mapping(Adapter):
     r"""
-    Adapter that maps objects to other objects. Translates objects after parsing and before building. Can for example, be used to translate between enum34 objects and strings, but Enum class supports enum34 already and is recommended.
+    Adapter that maps objects to other objects. Translates objects after parsing and before building. Can for example, be used to translate between enum objects and strings, but Enum class supports enum module already and is recommended.
 
     :param subcon: Construct instance
     :param mapping: dict, for encoding (building) mapping, the reversed is used for parsing mapping
