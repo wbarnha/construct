@@ -1,6 +1,11 @@
 from construct.lib.py3compat import *
 import re
 import collections
+import sys
+
+OrderedDict = dict
+if sys.version_info < (3, 7):
+    OrderedDict = collections.OrderedDict
 
 
 globalPrintFullStrings = False
@@ -56,7 +61,7 @@ def recursion_lock(retval="<recursion detected>", lock_name="__recursion_lock__"
     return decorator
 
 
-class Container(collections.OrderedDict):
+class Container(OrderedDict):
     r"""
     Generic ordered dictionary that allows both key and attribute access, and preserves key order by insertion. Adding keys is preferred using \*\*entrieskw (requires Python 3.6). Equality does NOT check item order. Also provides regex searching.
 
