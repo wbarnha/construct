@@ -246,6 +246,20 @@ class Container(OrderedDict):
         compiled_pattern = re.compile(pattern)
         return self._search(compiled_pattern, True)
 
+    def __getstate__(self):
+        """
+        Used by pickle to serialize an instance to a dict.
+        """
+        ret = OrderedDict(self)
+        return ret
+
+    def __setstate__(self, state):
+        """
+        Used by pickle to de-serialize from a dict.
+        """
+        self.clear()
+        self.update(state)
+
 
 class ListContainer(list):
     r"""
