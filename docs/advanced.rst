@@ -179,12 +179,12 @@ For completeness, there is also ``Mapping`` class, but using it is not recommend
 
 ::
 
-    >>> x = 'any hashable objects'
+    >>> x = 'any hashable object'
     >>> d = Mapping(Byte, {x: 0})
     >>> d.build(x)
     b'\x00'
     >>> d.parse(b"\x00")
-    'any hashable objects'
+    'any hashable object'
 
 
 Processing files

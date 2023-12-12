@@ -29,7 +29,7 @@ Generally speaking, you should not write constructs by yourself:
 
 * It's a craft that requires skills and understanding of the internals of the library (which change over time).
 * Adapters should really be all you need and are much simpler to implement.
-* To make things faster, try using compilation feature, or pypy. The python-level classes are as fast as it gets, assuming generality.
+* To make things faster, try using compilation feature or pypy. The python-level classes are as fast as it gets, assuming generality.
 
 The only reason you might want to write a custom class is to achieve something that's not currently possible. This might be a construct that computes/corrects the checksum of data, altough that already exists. Or a compression, or hashing. These also exist. But surely there is something that was not invented yet. If you need a semantics modification to an existing class, you can post a feature request, or copy the code of existing class into your project and modify it.
 
@@ -38,7 +38,7 @@ There are at least two kinds of constructs: raw construct and subconstructs.
 Raw constructs
 ---------------------
 
-Deriving directly from class ``Construct``, raw constructs can do as they wish by implementing ``_parse``, ``_build``, and ``_sizeof``::
+Deriving directly from class ``Construct``, raw constructs can do as they wish by implementing ``_parse``, ``_build`` and ``_sizeof``::
 
     class MyConstruct(Construct):
         def _parse(self, stream, context, path):
@@ -57,13 +57,13 @@ Deriving directly from class ``Construct``, raw constructs can do as they wish b
             # or raise SizeofError (when variable size or unknown)
             pass
 
-Variable size fields typically raise ``SizeofError``, for example VarInt and CString.
+Variable size fields typically raise ``SizeofError``, for example ``VarInt`` and ``CString``.
 
 
 Subconstructs
 ---------------------
 
-Deriving from class Subconstruct, these wrap an inner construct, inheriting it's properties (name and flags). In their ``_parse`` and ``_build`` and ``_sizeof`` methods, they will call ``self.subcon._parse`` and ``self.subcon._build`` and ``self.subcon._sizeof`` respectively.  ::
+Deriving from class Subconstruct, these wrap an inner construct, inheriting its properties (name and flags). In their ``_parse``, ``_build`` and ``_sizeof`` methods, they will call ``self.subcon._parse``, ``self.subcon._build`` and ``self.subcon._sizeof`` respectively.  ::
 
     class MySubconstruct(Subconstruct):
         def __init__(self, subcon):
