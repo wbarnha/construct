@@ -127,23 +127,14 @@ Thanks to blapid, containers can also be searched. Structs nested within Structs
 >>> con.search_all("a")
 [1, 2]
 
-Note that not all methods can be accessed via attribute access. If the name of an item matches a method name of a ``Container`` (which is a subclass of ``dict``), method will not be accessible through instance. You should call the method through class instead: ``Container.method(con, ...)``
+Note that not all parameters can be accessed via attribute access (dot operator). If the name of an item matches a method name of the Container (which is based on a dict), it can only be accessed via key acces (square brackets). This includes the following names: clear, copy, fromkeys, get, items, keys, move_to_end, pop, popitem, search, search_all, setdefault, update, values.
 
->>> con = Container()
->>> con.update
-<built-in method update of Container object at ...>
->>> con.update = 5
->>> con['update']
+>>> con = Container(update=5)
+>>> con["update"]
 5
->>> con.update
-5
->>> con.update(x=42)
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-TypeError: 'int' object is not callable
->>> Container.update(con, x=42)
->>> con
-Container(update=5, x=42)
+>>> con.update  # not usable via dot access
+<bound method Container.update of Container(update=5)>
+
 
 Nesting and embedding
 ---------------------

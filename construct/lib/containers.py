@@ -57,6 +57,7 @@ def recursion_lock(retval="<recursion detected>", lock_name="__recursion_lock__"
 
 
 class Container(dict):
+    # NOTE: be careful when working with these objects. Any method can be shadowed, so instead of doing `self.items()` you should do `dict.items(self)`. Operation that use methods implicitly (such as `x in self` or `self[k]`) will work as usual.
     r"""
     Generic ordered dictionary that allows both key and attribute access, and preserves key order by insertion. Adding keys is preferred using \*\*entrieskw. Equality does NOT check item order. Also provides regex searching.
 
@@ -92,38 +93,35 @@ class Container(dict):
         return self.__class__(self)
 
     def __copy__(self, /):
-        return self.copy()
+        return self.__class__.copy(self)
 
-    # this is required because otherwise deepcopy will
+    # this is required because otherwise copy.deepcopy() will
     # copy self and self.__dict__ separately for some reason
     def __deepcopy__(self, _, /):
-        return self.copy()
+        return self.__class__.copy(self)
 
     def __dir__(self, /):
         """For auto completion of attributes based on container values."""
-        return list(self.keys()) + list(self.__class__.__dict__) + dir(super(Container, self))
+        return list(self.__class__.keys(self)) + list(self.__class__.__dict__) + dir(super(Container, self))
 
     def __eq__(self, other, /):
         if self is other:
             return True
         if not isinstance(other, dict):
             return False
-
         def isequal(v1, v2):
             if v1.__class__.__name__ == "ndarray" or v2.__class__.__name__ == "ndarray":
                 import numpy
-
                 return numpy.array_equal(v1, v2)
             return v1 == v2
-
-        for k, v in self.items():
+        for k, v in self.__class__.items(self):
             if isinstance(k, unicodestringtype) and k.startswith(u"_"):
                 continue
             if isinstance(k, bytestringtype) and k.startswith(b"_"):
                 continue
             if k not in other or not isequal(v, other[k]):
                 return False
-        for k, v in other.items():
+        for k, v in other.__class__.items(other):
             if isinstance(k, unicodestringtype) and k.startswith(u"_"):
                 continue
             if isinstance(k, bytestringtype) and k.startswith(b"_"):
@@ -138,7 +136,7 @@ class Container(dict):
     @recursion_lock()
     def __repr__(self, /):
         parts = []
-        for k, v in self.items():
+        for k, v in self.__class__.items(self):
             if isinstance(k, str) and k.startswith("_"):
                 continue
             if isinstance(v, stringtypes):
@@ -152,22 +150,16 @@ class Container(dict):
         indentation = "\n    "
         text = ["Container: "]
         isflags = getattr(self, "_flagsenum", False)
-        for k, v in self.items():
+        for k, v in self.__class__.items(self):
             if isinstance(k, str) and k.startswith("_") and not globalPrintPrivateEntries:
                 continue
             if isflags and not v and not globalPrintFalseFlags:
                 continue
             text.extend([indentation, str(k), " = "])
             if v.__class__.__name__ == "EnumInteger":
-                text.append("(enum) (unknown) %s" % (v,))
+                text.append("(enum) (unknown) %s" % (v, ))
             elif v.__class__.__name__ == "EnumIntegerString":
-                text.append(
-                    "(enum) %s %s"
-                    % (
-                        v,
-                        v.intvalue,
-                    )
-                )
+                text.append("(enum) %s %s" % (v, v.intvalue, ))
             elif v.__class__.__name__ in ["HexDisplayedBytes", "HexDumpDisplayedBytes"]:
                 text.append(indentation.join(str(v).split("\n")))
             elif isinstance(v, bytestringtype):
@@ -175,27 +167,23 @@ class Container(dict):
                 if len(v) <= printingcap or globalPrintFullStrings:
                     text.append("%s (total %d)" % (reprstring(v), len(v)))
                 else:
-                    text.append(
-                        "%s... (truncated, total %d)" % (reprstring(v[:printingcap]), len(v))
-                    )
+                    text.append("%s... (truncated, total %d)" % (reprstring(v[:printingcap]), len(v)))
             elif isinstance(v, unicodestringtype):
                 printingcap = 32
                 if len(v) <= printingcap or globalPrintFullStrings:
                     text.append("%s (total %d)" % (reprstring(v), len(v)))
                 else:
-                    text.append(
-                        "%s... (truncated, total %d)" % (reprstring(v[:printingcap]), len(v))
-                    )
+                    text.append("%s... (truncated, total %d)" % (reprstring(v[:printingcap]), len(v)))
             else:
                 text.append(indentation.join(str(v).split("\n")))
         return "".join(text)
 
     def _search(self, compiled_pattern, search_all, /):
         items = []
-        for key in self.keys():
+        for key, value in self.__class__.items(self):
             try:
-                if isinstance(self[key], (Container, ListContainer)):
-                    ret = self[key]._search(compiled_pattern, search_all)
+                if isinstance(value, (Container, ListContainer)):
+                    ret = value.__class__._search(value, compiled_pattern, search_all)
                     if ret is not None:
                         if search_all:
                             items.extend(ret)
@@ -203,10 +191,10 @@ class Container(dict):
                             return ret
                 elif compiled_pattern.match(key):
                     if search_all:
-                        items.append(self[key])
+                        items.append(value)
                     else:
-                        return self[key]
-            except:
+                        return value
+            except Exception:
                 pass
         if search_all:
             return items
@@ -218,14 +206,14 @@ class Container(dict):
         Searches a container (non-recursively) using regex.
         """
         compiled_pattern = re.compile(pattern)
-        return self._search(compiled_pattern, False)
+        return self.__class__._search(self, compiled_pattern, False)
 
     def search_all(self, pattern):
         """
         Searches a container (recursively) using regex.
         """
         compiled_pattern = re.compile(pattern)
-        return self._search(compiled_pattern, True)
+        return self.__class__._search(self, compiled_pattern, True)
 
     def __getstate__(self, /):
         """
@@ -237,8 +225,8 @@ class Container(dict):
         """
         Used by pickle to de-serialize from a dict.
         """
-        self.clear()
-        self.update(state)
+        self.__class__.clear(self)
+        self.__class__.update(self, state)
 
 
 class ListContainer(list):
@@ -281,8 +269,8 @@ class ListContainer(list):
         items = []
         for item in self:
             try:
-                ret = item._search(compiled_pattern, search_all)
-            except:
+                ret = item.__class__._search(item, compiled_pattern, search_all)
+            except Exception:
                 continue
             if ret is not None:
                 if search_all:
