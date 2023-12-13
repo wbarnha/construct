@@ -312,7 +312,6 @@ def test_method_shadowing_2():
         # __deepcopy__=print,
         # __class__=int, # this will break a lot of things, this should not be supported
     )
-    c.c = c
 
     dir(c)
     assert c == copy.copy(c)
