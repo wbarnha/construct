@@ -146,16 +146,12 @@ class Container(OrderedDict):
                 return numpy.array_equal(v1, v2)
             return v1 == v2
         for k,v in self.items():
-            if isinstance(k, unicodestringtype) and k.startswith(u"_"):
-                continue
-            if isinstance(k, bytestringtype) and k.startswith(b"_"):
+            if isinstance(k, str) and k.startswith("_"):
                 continue
             if k not in other or not isequal(v, other[k]):
                 return False
         for k,v in other.items():
-            if isinstance(k, unicodestringtype) and k.startswith(u"_"):
-                continue
-            if isinstance(k, bytestringtype) and k.startswith(b"_"):
+            if isinstance(k, str) and k.startswith("_"):
                 continue
             if k not in self or not isequal(v, self[k]):
                 return False
@@ -170,10 +166,7 @@ class Container(OrderedDict):
         for k,v in self.items():
             if isinstance(k, str) and k.startswith("_"):
                 continue
-            if isinstance(v, stringtypes):
-                parts.append(str(k) + "=" + reprstring(v))
-            else:
-                parts.append(str(k) + "=" + repr(v))
+            parts.append(f'{k}={v!r}')
         return "Container(%s)" % ", ".join(parts)
 
     @recursion_lock()
@@ -193,18 +186,18 @@ class Container(OrderedDict):
                 text.append("(enum) %s %s" % (v, v.intvalue, ))
             elif v.__class__.__name__ in ["HexDisplayedBytes", "HexDumpDisplayedBytes"]:
                 text.append(indentation.join(str(v).split("\n")))
-            elif isinstance(v, bytestringtype):
+            elif isinstance(v, bytes):
                 printingcap = 16
                 if len(v) <= printingcap or globalPrintFullStrings:
-                    text.append("%s (total %d)" % (reprstring(v), len(v)))
+                    text.append("%s (total %d)" % (repr(v), len(v)))
                 else:
-                    text.append("%s... (truncated, total %d)" % (reprstring(v[:printingcap]), len(v)))
-            elif isinstance(v, unicodestringtype):
+                    text.append("%s... (truncated, total %d)" % (repr(v[:printingcap]), len(v)))
+            elif isinstance(v, str):
                 printingcap = 32
                 if len(v) <= printingcap or globalPrintFullStrings:
-                    text.append("%s (total %d)" % (reprstring(v), len(v)))
+                    text.append("%s (total %d)" % (repr(v), len(v)))
                 else:
-                    text.append("%s... (truncated, total %d)" % (reprstring(v[:printingcap]), len(v)))
+                    text.append("%s... (truncated, total %d)" % (repr(v[:printingcap]), len(v)))
             else:
                 text.append(indentation.join(str(v).split("\n")))
         return "".join(text)
