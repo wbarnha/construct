@@ -289,3 +289,9 @@ def test_regression_recursionlock():
     c = Container()
     str(c); repr(c)
     assert not c
+
+def test_method_shadowing():
+    c = Container()
+    assert c.update != 42
+    c['update'] = 42
+    assert c.update == 42
