@@ -17,14 +17,14 @@ class HexDisplayedBytes(bytes):
     """Used internally."""
     def __str__(self):
         if not hasattr(self, "render"):
-            self.render = "unhexlify(%s)" % (binascii.hexlify(self), )
+            self.render = "unhexlify(%r)" % (binascii.hexlify(self).decode(), )
         return self.render
 
 class HexDisplayedDict(dict):
     """Used internally."""
     def __str__(self):
         if not hasattr(self, "render"):
-            self.render = "unhexlify(%s)" % (binascii.hexlify(self["data"]), )
+            self.render = "unhexlify(%r)" % (binascii.hexlify(self["data"]).decode(), )
         return self.render
 
 class HexDumpDisplayedBytes(bytes):
