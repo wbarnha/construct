@@ -9,7 +9,7 @@ Special
 Renamed
 -------
 
-Adds a name string to a field (which by default is ``None``). This class is only used internally and you should use the ``/`` and ``*`` operators instead. Naming fields is needed when working with ``Struct``'s and ``Union``'s, but also sometimes with ``Sequence``'s and ``FocusedSeq``.
+Adds a name string to a field (which by default is ``None``). This class is only used internally and you should use the ``/`` and ``*`` operators instead. Naming fields is needed when working with ``Struct`` and ``Union``, but also sometimes with ``Sequence`` and ``FocusedSeq``.
 
 ::
 
@@ -38,7 +38,7 @@ By default, ``Const`` uses a ``Bytes`` field with size matching the value. Howev
 >>> d.build(None)
 b'\xff\x00\x00\x00'
 
-The shortcoming is that it only works if the amount and exact bytes are known in advance. To check if a "variable" data meets some criterium (not mere equality), you would need the :class:`~construct.core.Check` class. There is also :class:`~construct.core.OneOf` and :class:`~construct.core.NoneOf` class.
+The shortcoming is that it only works if the amount and exact bytes are known in advance. To check if a "variable" data meets some criterium (not mere equality), you would need the ``Check`` class. There is also ``OneOf`` and ``NoneOf`` class.
 
 
 Computed
@@ -46,14 +46,14 @@ Computed
 
 Represents a value dynamically computed from the context. ``Computed`` does not read or write anything to the stream. It only computes a value (usually by extracting a key from a context dictionary) and returns its computed value as the result. Usually ``Computed`` fields are used for computations on the context dict. Context is explained in a previous chapter. However, ``Computed`` can also produce values based on external environment, ``random`` module, or constants. For example:
 
->>> st = Struct(
+>>> d = Struct(
 ...     "width" / Byte,
 ...     "height" / Byte,
 ...     "total" / Computed(this.width * this.height),
 ... )
->>> st.parse(b"12")
+>>> d.parse(b"12")
 Container(width=49, height=50, total=2450)
->>> st.build(dict(width=4, height=5))
+>>> d.build(dict(width=4, height=5))
 b'\x04\x05'
 
 >>> d = Computed(lambda ctx: os.urandom(10))
@@ -87,11 +87,11 @@ Rebuild
 
 When there is an array separated from its length field, the ``Rebuild`` wrapper can be used to measure the length of the list when building. Note that both the ``len_`` and ``this`` expressions are used as discussed in meta chapter. Only building is affected, parsing is simply deferred to subcon.
 
->>> st = Struct(
+>>> d = Struct(
 ...     "count" / Rebuild(Byte, len_(this.items)),
 ...     "items" / Byte[this.count],
 ... )
->>> st.build(dict(items=[1,2,3]))
+>>> d.build(dict(items=[1,2,3]))
 b'\x03\x01\x02\x03'
 
 When the count field is directly before the items, ``PrefixedArray`` can be used instead:
@@ -106,12 +106,12 @@ Default
 
 Allows to make a field have a default value, which comes handly when building a ``Struct`` from a dict with missing keys. Only building is affected, parsing is simply deferred to subcon.
 
->>> st = Struct(
+>>> d = Struct(
 ...     "a" / Default(Byte, 0),
 ... )
->>> st.build(dict(a=1))
+>>> d.build(dict(a=1))
 b'\x01'
->>> st.build(dict())
+>>> d.build(dict())
 b'\x00'
 
 
@@ -120,28 +120,32 @@ Check
 
 When fields are expected to be coherent in some way but integrity cannot be checked by merely comparing data with constant bytes using ``Const`` field, then a ``Check`` field can be put in place to get a key from context dict and check if the integrity is preserved. For example, maybe there is a count field (implied being non-negative but the field is signed type):
 
->>> st = Struct(
+>>> d = Struct(
 ...     "num" / Int8sb,
 ...     "integrity1" / Check(this.num > 0),
 ... )
->>> st.parse(b"\xff")
-CheckError: check failed during parsing
+>>> d.parse(b"\xff")
+CheckError: Error in path (parsing) -> integrity1
+check failed during parsing
 
 Or there is a collection and a count provided and the count is expected to match the collection length (which might go out of sync by mistake). Note that ``Rebuild`` is more appropriate but the check is also possible:
 
->>> st = Struct(
+>>> d = Struct(
 ...     "count" / Byte,
 ...     "items" / Byte[this.count],
 ... )
 >>> st.build(dict(count=9090, items=[]))
-FormatFieldError: struct '>B' error during building, given value 9090
->>> st = Struct(
+FormatFieldError: Error in path (building) -> count
+struct '>B' error during building, given value 9090
+
+>>> d = Struct(
 ...     "integrity" / Check(this.count == len_(this.items)), 
 ...     "count" / Byte, 
 ...     "items" / Byte[this.count],
 ... )
->>> st.build(dict(count=9090, items=[]))
-CheckError: check failed during building
+>>> d.build(dict(count=9090, items=[]))
+CheckError: Error in path (building) -> integrity
+check failed during building
 
 
 Error
@@ -150,7 +154,8 @@ Error
 You can also explicitly raise an error, declaratively with a construct.
 
 >>> Error.parse(b"")
-ExplicitError: Error field was activated during parsing
+ExplicitError: Error in path (parsing)
+Error field was activated during parsing
 
 
 FocusedSeq
@@ -158,7 +163,7 @@ FocusedSeq
 
 When a sequence has some fields that could be ommited like ``Const``, ``Padding`` or ``Terminated``, the user can focus on one particular field that is useful. Only one field can be focused on, and can be referred by index or name. Other fields must be able to build without a value:
 
->>> d = FocusedSeq(1, # or "num", 
+>>> d = FocusedSeq(1 or "num",
 ...     Const(b"MZ"),
 ...     "num" / Byte,
 ...     Terminated,
@@ -172,7 +177,7 @@ b'MZ\xff'
 Pickled
 ----------
 
-For convenience, arbitrary Python objects can be preserved using the famous pickle protocol. Almost any type can be pickled, but you have to understand that pickle uses its own (homebrew) protocol that is not a standard outside Python. Therefore, you can forget about parsing the binary blobs using other languages. There are also some minor considerations, like pickle protocol requiring Python 3.0 version or so. Its useful, but it automates things beyond your understanding.
+For convenience, arbitrary Python objects can be preserved using the famous pickle protocol. Almost any type can be pickled, but you have to understand that pickle uses its own (homebrew) protocol that is not a standard outside Python. Therefore, you can forget about parsing the binary blobs using other languages. Its useful, but it automates things beyond your understanding.
 
 >>> obj = [1, 2.3, {}]
 >>> Pickled.build(obj)
@@ -207,11 +212,12 @@ coord(x=49, y=50, z=51)
 Timestamp
 ----------
 
-Datetimes can be represented using ``Timestamp`` class. It supports modern formats and even MSDOS one. Note however that this class is not guaranteed to provide "exact" accurate values, due to several reasons explained in the docstring.
+Datetimes can be parsed using ``Timestamp`` class. It supports modern formats and even MSDOS one. Note however that this class is not guaranteed to provide "exact" accurate values, due to several reasons explained in the docstring.
 
 >>> d = Timestamp(Int64ub, 1., 1970)
 >>> d.parse(b'\x00\x00\x00\x00ZIz\x00')
 <Arrow [2018-01-01T00:00:00+00:00]>
+
 >>> d = Timestamp(Int32ub, "msdos", "msdos")
 >>> d.parse(b'H9\x8c"')
 <Arrow [2016-01-25T17:33:04+00:00]>
@@ -270,6 +276,8 @@ hexundump('''
 hexundump('''
 0000   00 00 01 02                                       ....
 ''')
+
+.. warning:: Note that Hex and possibly HexDump do not work correctly within a ``Bitwise`` context.
 
 
 Conditional
@@ -355,7 +363,7 @@ b''
 If
 --
 
-Parses or builds the subconstruct only if a certain condition is met. Otherwise, returns a ``None`` when parsing and puts nothing when building. The condition is a lambda that computes on the context just like in Computed examples.
+Parses or builds the subconstruct only if a certain condition is met. Otherwise, returns a ``None`` when parsing and puts nothing into the stream when building. The condition is a lambda that computes on the context just like in Computed examples.
 
 >>> d = If(this.x > 0, Byte)
 >>> d.build(255, x=1)
@@ -375,11 +383,11 @@ b'\xff\x01'
 >>> d.build(255, x=0)
 b'\xff'
 
-In particular, you can use different subcons for parsing and building. The ``_parsing``, ``_building`` and ``_sizing``context entries have boolean values that always exist, only one of them that corresponds to current action is set to ``True``. For convenience, those two entries are duplicated in ``Struct``, ``Sequence``, ``FocusedSeq`` and ``Union`` nested contexts. You dont need to reach for the top-most entry. This comes handy when using hackish constructs to achieve some complex semantics that are not available in the core library.
+In particular, you can use different subcons for parsing and building. The ``_parsing``, ``_building`` and ``_sizing`` context entries have boolean values that always exist, only one of them that corresponds to current action is set to ``True``. For convenience, those two entries are duplicated in ``Struct``, ``Sequence``, ``FocusedSeq`` and ``Union`` nested contexts. You dont need to reach for the top-most entry. This comes handy when using hackish constructs to achieve some complex semantics that are not available in the core library.
 
 ::
 
-    Struct(
+    d = Struct(
         If(this._parsing, ...),
         If(this._building, ...),
     )
@@ -406,7 +414,7 @@ b'\x01'
 StopIf
 ------
 
-Checks for a condition after each element, and stops a ``Struct``, ``Sequence`` or ``GreedyRange`` from parsing or building following elements.
+Checks for a condition after each element, and stops a ``Struct``, ``Sequence`` or ``GreedyRange`` from parsing or building further.
 
 ::
 
@@ -421,7 +429,7 @@ Alignment and padding
 Padding
 -------
 
-Adds additional null bytes (a filler) analog to ``Padded`` but without a subcon that follows it. This field is usually anonymous inside a ``Struct``. Internally this is just ``Padded(n, Pass)``.
+Adds additional null bytes (a filler) analog to ``Padded`` but without a subcon. This field is usually anonymous inside a ``Struct``. Internally this is just ``Padded(n, Pass)`` where ``n`` is an amount of null bytes.
 
 >>> d = Padding(4)
 >>> d.parse(b"****")

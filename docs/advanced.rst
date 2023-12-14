@@ -44,10 +44,9 @@ Long integers (or those of particularly odd sizes) can be encoded using a ``Byte
 >>> BytesInteger(16).build(255)
 b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff'
 
-Some numerical classes are implemented using ``struct`` module, others use ``BytesInteger`` field.
+Some numerical classes, those being ``FormatField``, are implemented using builtin ``struct`` module:
 
 >>> d = FormatField("<", "l")
->>> d = BytesInteger(4, swapped=True) # same thing
 >>> d.build(1)
 b'\x01\x00\x00\x00'
 
@@ -71,7 +70,7 @@ b'12345'
 >>> GreedyBytes.parse(b"39217839219...")
 b'39217839219...'
 
-Since recently, you can also build from bytearrays too:
+You can also build from ``bytearray`` objects:
 
 >>> GreedyBytes.build(bytearray(b'12345'))
 b'12345'
@@ -119,28 +118,28 @@ True
 >>> Flag.build(True)
 b'\x01'
 
-``Enum`` translates between string labels and integer values. Parsing returns a string (if value has mapping) but returns an integer otherwise. This creates no problem since ``Enum`` can build from string and integer representations just the same. Note that resulting string has a special implementation, so it can be converted into a corresponding integer.
+``Enum`` translates between string labels and integer values. Parsing returns an ``EnumIntegerString`` (a sort of string and int at same time, if value has mapping) but returns an integer otherwise. This creates no problem since ``Enum`` can build from string and integer representations just the same. Note that resulting string has a special implementation, so it can be converted into a corresponding integer.
 
 >>> d = Enum(Byte, one=1, two=2, four=4, eight=8)
 >>> d.parse(b"\x01")
 EnumIntegerString.new(1, 'one')
 >>> int(d.parse(b"\x01"))
 1
+>>> str(d.parse(b"\x01"))
+"one"
 >>> d.parse(b"\xff")
-255
->>> int(d.parse(b"\xff"))
 255
 
 Note that string values can also be obtained using attribute members. 
 
+>>> d.one
+EnumIntegerString.new(1, 'one')
 >>> d.build(d.one)
 b'\x01'
 >>> d.build("one")
 b'\x01'
 >>> d.build(1)
 b'\x01'
->>> d.one
-EnumIntegerString.new(1, 'one')
 
 ``FlagsEnum`` decomposes an integer value into a set of string labels:
 
@@ -192,7 +191,7 @@ Processing files
 
 .. warning::
 
-    Opening a file without mode like ``open(filename)`` implies text mode, which cannot be parsed or build.
+    Opening a file without mode like ``open(filename)`` implies text mode, which cannot be parsed or built.
 
 Constructs can parse both in-memory data (``bytes``) and binary files:
 
@@ -214,7 +213,8 @@ Top-most structures should have elaborate descriptions, documenting who made the
 
     """
     Full docstring with autor, email, links to RFC-alike pages.
-    """ * Struct(
+    """ *
+    Struct(
         "title" / CString("utf8"),
         Padding(2) * "reserved, see 8.1",
     )

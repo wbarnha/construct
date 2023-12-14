@@ -4,7 +4,7 @@ Stream manipulation
 
 .. note::
 
-    Certain constructs are available only for seekable or tellable streams (in-memory and files). Sockets and pipes do not support neither, so you'll have to first read the data from the stream and parse it in-memory, or use experimental :class:`~construct.core.Rebuffered` wrapper.
+    Certain constructs are available only for seekable and tellable streams (in-memory and files). Sockets and pipes do not support neither, so you'll have to first read the data from the stream and parse it in-memory, or use experimental ``Rebuffered`` wrapper.
 
 
 Field wrappers
@@ -26,7 +26,7 @@ ListContainer([513, 258])
 >>> d.sizeof()
 0
 
-``OffsettedEnd`` parses a greedy subcon until EOF plus a negative offset. This way you can read (almost) all data but leaving some bytes left for a fixed sized footer.
+``OffsettedEnd`` parses a greedy subcon until EOF plus a negative offset. This way you can read (almost) all data but leave some bytes left for a fixed sized footer.
 
 >>> d = Struct(
 ...     "header" / Bytes(2),
@@ -72,4 +72,6 @@ b''
 >>> Terminated.parse(b"")
 None
 >>> Terminated.parse(b"remaining")
-construct.core.TerminatedError: expected end of stream
+TerminatedError: Error in path (parsing)
+expected end of stream
+

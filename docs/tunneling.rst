@@ -67,7 +67,7 @@ ListContainer([1684234849, 1751606885])
 
 There are also other means of restricting constructs to substreamed data. All 3 classes below work by substreaming data, meaning the subcon is not given the original stream but a new ``BytesIO`` made out of pre-read bytes. This allows ``Greedy*`` fields to work properly.
 
-``FixedSized`` consumes a specified amount and then exposes inner construct to a new stream build out of those bytes. When building, it appends a padding to make a specified total.
+``FixedSized`` consumes a specified amount and then exposes inner construct to a new stream built out of those bytes. When building, it appends a padding to make a specified total.
 
 >>> d = FixedSized(10, Byte)
 >>> d.parse(b'\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00')
@@ -90,9 +90,9 @@ There are also other means of restricting constructs to substreamed data. All 3 
 
 .. warning::
 
-    The term can be multiple bytes, to support string classes with UTF16/32 encodings for example. Be warned however: as reported in Issue 1046, the data read must be a multiple of the term length and the term must start at a unit boundary, otherwise strange things happen when parsing.
+    The term can be multiple bytes, to support string classes with UTF16/32 encodings for example. Be warned however: as reported in Issue #1046, the data read must be a multiple of the term length and the term must start at a unit boundary, otherwise strange things happen when parsing.
 
-``NullStripped`` consumes bytes till EOF, and for that matter should be restricted by ``Prefixed``, ``FixedSized`` etc, and then strips paddings. Subcon is parsed using a new stream build using those stripped bytes. When building, it just builds the subcon as-is.
+``NullStripped`` consumes bytes till EOF, and for that matter should be restricted by ``Prefixed``, ``FixedSized`` etc, and then strips paddings. Subcon is parsed using a new stream built using those stripped bytes. When building, it just builds the subcon as-is.
 
 >>> d = NullStripped(Byte)
 >>> d.parse(b'\xff\x00\x00')
@@ -102,7 +102,7 @@ There are also other means of restricting constructs to substreamed data. All 3 
 Working with different bytes
 --------------------------------------------------
 
-``RestreamData`` allows you to insert a field that parses some data that came either from some other field, from the context (like ``Bytes``) or some literal hardcoded value in your code. Comes handy when for example, you are testing a large struct by parsing null bytes, but some field is unable to parse null bytes (like Numpy). It substitutes the stream with another data for the purposes of parsing a particular field in a Struct.
+``RestreamData`` allows you to insert a field that parses some data that came either from some other field, from the context (like ``Bytes``) or some literal hardcoded value in your code. Comes handy when for example, you are testing a large struct by parsing null bytes, but some field is unable to parse null bytes (like ``Numpy``). It substitutes the stream with another data for the purposes of parsing a particular field in a ``Struct``.
 
 Instead of data itself (bytes object) you can reference another stream (taken from the context like ``this._stream``) or use a Construct that parses into bytes (including those exposed via context like ``this._subcons.field``).
 
@@ -225,7 +225,7 @@ Data can be easily checksummed. Note that checksum field does not need to be ``B
     d.build(dict(fields=dict(value={})))
 
 
-Data can also be easily compressed. Supported encodings include zlib/gzip/bzip2/lzma and entire codecs module. When parsing, entire stream is consumed. When building, it puts compressed bytes without marking the end. This construct should be used with :class:`~construct.core.Prefixed` or entire stream.
+Data can also be easily compressed. Supported encodings include zlib/gzip/bzip2/lzma and entire codecs module. When parsing, entire stream is consumed. When building, it puts compressed bytes without marking the end. This construct should be used with ``Prefixed`` or entire stream.
 
 >>> d = Prefixed(VarInt, Compressed(GreedyBytes, "zlib"))
 >>> d.build(bytes(100))

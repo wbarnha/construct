@@ -46,16 +46,16 @@ Compiling schemas
 
 Every construct (even those that do not compile) has a parameter-less ``compile`` method that returns also a construct (instance of ``Compiled`` class). It may be a good idea to compile something that is used for processing megabyte-sized data or millions of blobs. That compiled instance has ``parse`` and ``build`` methods just like the construct it was compiled from. Therefore, in your code, you can simply reassign the compiled instance over the original one.
 
->>> st = Struct("num" / Byte)
->>> st.parse(b"\x01")
+>>> d = Struct("num" / Byte)
+>>> d.parse(b"\x01")
 Container(num=1)
->>> st = st.compile(filename="copyforinspection.py")
->>> st.parse(b"\x01")
+>>> d = d.compile(filename="copyforinspection.py")
+>>> d.parse(b"\x01")
 Container(num=1)
 
 Performance boost can be easily measured. This method also happens to be testing the correctness of the compiled parser, by making sure that both original and compiled instance parse into same results.
 
->>> print(st.benchmark(sampledata))
+>>> print(d.benchmark(sampledata))
 Compiled instance performance:
 parsing:            0.0001288388 sec/call
 parsing compiled:   0.0000452531 sec/call

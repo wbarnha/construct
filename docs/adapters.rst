@@ -5,7 +5,7 @@ Adapters and Validators
 Adapting
 ==============
 
-Adapting is the process of converting one representation of an object to another. One representation is usually "lower" (closer to the byte level), and the other "higher" (closer to the python object model). The process of converting the lower representation to the higher one is called decoding, and the process of converting the higher level representation to the lower one is called encoding. Encoding and decoding are expected to be symmetrical, so that they counter-act each other ``encode(decode(x)) == x`` and ``decode(encode(x)) == x``.
+Adapting is the process of converting one representation of an object into another. One representation is usually "lower" (closer to the byte level), and the other is "higher" (closer to the python object model). The process of converting the lower representation to the higher one is called decoding, and the process of converting the higher level representation to the lower one is called encoding. Encoding and decoding are expected to be symmetrical, so that they counter-act each other ``encode(decode(x)) == x`` and ``decode(encode(x)) == x``.
 
 Custom adapter classes derive from the abstract ``Adapter`` class, and implement their own versions of ``_decode`` and ``_encode``, as shown below:
 
@@ -33,7 +33,7 @@ Note that the adapter does not perform any manipulation of the stream, it only c
         def _build(self, obj, stream, context, path):
             return self.subcon._build(self._encode(obj, context, path), stream, context, path)
 
-This is called separation of concern, and is a key feature of component-oriented programming. It allows us to keep each component very simple and unaware of its consumers. Whenever we need a different representation of the data, we don't need to write a new construct -- we only write the suitable adapter.
+This is called separation of concern, and is a key feature of component-oriented programming. It allows us to keep each component very simple and unaware of its consumers. Whenever we need a different representation of the data, we don't need to write a new construct -- usually we only write the suitable adapter.
 
 So, let's see our adapter in action:
 
@@ -89,7 +89,8 @@ Validating means making sure the parsed/built object meets a given condition. Va
     >>> VersionNumber.build(3)
     b'\x03'
     >>> VersionNumber.build(88)
-    ValidationError: object failed validation: 88
+    ValidationError: Error in path (building)
+    object failed validation: 88
 
 For reference, this is how it works under the hood (in core library):
 
@@ -106,7 +107,7 @@ For reference, this is how it works under the hood (in core library):
 Using expressions instead of classes
 ------------------------------------
 
-Validators can also be created declaratively using ``ExprValidator``. Unfortunately ``obj_`` expression does not work with ``in`` (contains) operator, nor with ``and or not`` logical operators. But it still has the advantage that it can be declared inlined. Adapter and Validator derived classes cannot be inlined inside a ``Struct``.
+Validators can also be created declaratively using ``ExprValidator``. Unfortunately ``obj_`` expression does not work with ``in`` (contains) operator, nor with ``and or not`` logical operators. But it still has the advantage that it can be declared inlined. ``Adapter`` and ``Validator`` derived classes cannot be inlined inside a ``Struct``.
 
 For example, if 7 out of 8 bits are not allowed to be set (like a flag boolean):
 
@@ -116,4 +117,6 @@ For example, if 7 out of 8 bits are not allowed to be set (like a flag boolean):
     >>> d.build(1)
     b'\x01'
     >>> d.build(88)
-    ValidationError: object failed validation: 88
+    ValidationError: Error in path (building)
+    object failed validation: 88
+

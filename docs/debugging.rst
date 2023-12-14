@@ -11,7 +11,7 @@ Most end-user bugs originate from handling the context wrong. Sometimes you forg
 Probe
 =============
 
-The ``Probe`` simply dumps information to the screen. It will help you inspect the context tree, the stream, and partially constructed objects, so you can understand your problem better. It has the same interface as any other field, and you can just stick it into a Struct, near the place you wish to inspect. Do note that the printout happens during the construction, before the final object is ready.
+The ``Probe`` simply dumps information to the screen. It will help you inspect the context tree, the stream, and partially constructed objects, so you can understand your problem better. It has the same interface as any other field, and you can just stick it into a ``Struct``, near the place you wish to inspect. Do note that the printout happens during the construction, before the final object is ready.
 
 ::
 

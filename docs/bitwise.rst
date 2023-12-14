@@ -41,16 +41,16 @@ Container(a=True, b=7, c=887, d=None)
 >>> d.sizeof()
 2
 
-``BitStruct`` is actually just a wrapper for the :class:`~construct.core.Bitwise` around a :class:`~construct.core.Struct` .
+``BitStruct`` is actually just a wrapper for the ``Bitwise`` around a ``Struct`` .
 
 
 Important notes
 ===============
 
-* ``BitStruct``'s are non-nestable (because ``Bitwise`` are not nestable) so writing something like ``BitStruct(BitStruct(Octet))`` will not work. You can use regular ``Struct``'s inside ``BitStruct``'s.
+* ``BitStruct``'s are non-nestable (because ``Bitwise`` are not nestable) so writing something like ``BitStruct(BitStruct(Octet))`` will not work. You can use regular ``Struct`` inside ``BitStruct`` .
 * Byte aligned - The total size of the elements of a ``BitStruct`` must be a multiple of 8 (due to alignment issues). ``RestreamedBytesIO`` will raise an error if the amount of bits and bytes does not align properly.
 * ``GreedyRange``, ``Pointer`` and any ``Lazy*`` - Do not place fields that do seeking/telling or lazy parsing inside ``Bitwise``, because ``RestreamedBytesIO`` offsets will turn out wrong, have unknown side-effects or raise unknown exceptions.
-* Normal (byte-oriented) classes like ``Int*`` or ``Float*`` can be used by wrapping in ``Bytewise``. If you need to mix byte- and bit-oriented fields, you should use a BitStruct and Bytewise.
+* Normal (byte-oriented) classes like ``Int*`` or ``Float*`` can be used by wrapping in ``Bytewise``. If you need to mix byte- and bit-oriented fields, you should use a ``BitStruct`` and ``Bytewise`` .
 * Advanced classes like tunneling may not work in bitwise context. Only basic fields like integers were throughly tested.
 
 
@@ -113,7 +113,7 @@ b' '
 >>> d.sizeof()
 1
 
-So unlike "classical Construct", there's no need for ``BytePadding`` and ``BitPadding``. If ``Padding`` is enclosed by a ``BitStruct``, it operates on bits, otherwise, it operates on bytes.
+So unlike "classical Construct", there's no need for ``BytePadding`` and ``BitPadding``. If ``Padding`` is enclosed by a ``Bitwise``, it operates on bits, otherwise, it operates on bytes.
 
 
 Fields that do not work and fail
