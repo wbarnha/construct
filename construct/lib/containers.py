@@ -61,16 +61,11 @@ class Container(dict):
     r"""
     Generic ordered dictionary that allows both key and attribute access, and preserves key order by insertion. Adding keys is preferred using \*\*entrieskw. Equality does NOT check item order. Also provides regex searching.
 
-    Note that not all parameters can be accessed via attribute access (dot operator). If the name of an item matches a method name of the Container, it can only be accessed via key acces (square brackets). This includes the following names: clear, copy, fromkeys, get, items, keys, move_to_end, pop, popitem, search, search_all, setdefault, update, values.
-
     Example::
 
-        # empty dict
         >>> Container()
-        # sequence of pairs
         >>> Container([("name", "anonymous"), ("age", 21)])
         >>> Container(name="anonymous", age=21)
-        # copies another dict
         >>> Container(dict2)
         >>> Container(container2)
 
