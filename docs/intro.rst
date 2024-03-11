@@ -64,17 +64,17 @@ Main documentation is at `readthedocs <http://construct.readthedocs.org>`_, whic
 
 Requirements
 --------------
-Construct should run on CPython 3.6 3.7 3.8 3.9 3.10 and PyPy implementations. PyPy achieves much better performance. Therefore PyPy would be somewhat recommended.
+Construct should run on CPython 3.8 3.9 3.10 3.11 3.12 (and probably beta) and PyPy implementations. PyPy achieves much better performance.
 
 Following modules are needed only if you want to use certain features:
 
-* Enum34 is optional if you want Enum EnumFlags to take labels from IntEnum IntFlag.
 * Numpy is optional, if you want to serialize arrays using Numpy protocol. Otherwise arrays can still be serialized using PrefixedArray.
 * Arrow is optional, if you want to use Timestamp class.
 * Different Python versions support different compression modules (like gzip lzma), if you want to use Compressed class.
 * Ruamel.yaml is optional, if you want to use KaitaiStruct (KSY) exporter.
 * Cloudpickle is optional, if you want to serialize the classes.
 * LZ4 is optional, if you want to use CompressedLZ4 class.
+* Cryptography is optional, if you want to use Encrypted* classes.
 
 
 Installing
@@ -82,8 +82,8 @@ Installing
 
 The library is downloadable and installable from Pypi. Just use standard command-line. There are no hard dependencies, but if you would like to install all supported (not required) modules listed above, you can use the 2nd command-line form.
 
-* pip install construct
-* pip install construct[extras]
+* ``pip install construct``
+* ``pip install construct[extras]``
 
 
 Type Hints / Type Annotations
@@ -91,7 +91,7 @@ Type Hints / Type Annotations
 
 As an extension to this library there is the `construct-typing <https://pypi.org/project/construct-typing/>`_ library, which provides PEP 561 compliant stub files for this library. It also provides extended adapters to describe complex structures using PEP 526 type annotations for improved static code analysis with mypy.
 
-* pip install construct-typing
+* ``pip install construct-typing``
 
 
 Visual Editor
@@ -99,5 +99,5 @@ Visual Editor
 
 Another fancy extension to this library is the `construct-editor <https://pypi.org/project/construct-editor/>`_ visual editor for binary blobs that uses Construct parsing classes internally.
 
-* pip install construct-editor
-* construct-editor
+* ``pip install construct-editor``
+* ``construct-editor``

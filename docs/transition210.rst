@@ -47,3 +47,9 @@ OffsettedEnd class added in streaming category
 EncryptedSym EncryptedSymAead classes were added in tunneling category
 
 StringEncoded now properly raises StringError exceptions on encoding/decoding (bugfix)
+
+Soft dependency on enum34 is no longer included
+
+Container class was overhauled (thanks to @denballakh)
+
+Supported Python runtimes (now 3.8 through 3.12) (thanks to @denballakh)
